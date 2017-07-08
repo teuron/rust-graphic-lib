@@ -1,0 +1,7 @@
+[package]
+name = "graphic_library"
+version = "0.1.0"
+authors = ["Lukas Abfalterer <labfalterer@gmail.com>"]
+
+[dependencies]
+raster = "0.1.0"
