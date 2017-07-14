@@ -1,13 +1,15 @@
 extern crate raster;
 
 use std;
-use geometric::Point2D;
-use geometric::Geometric2D;
-use geometric::interpolate;
+use geometric::{Point2D, Geometric2D, interpolate};
 use raster::Color;
 
+/// Represents a 2D Line
+#[derive(Debug)]
 pub struct Line2D {
+    /// Start-Point of the Line
     from: Point2D,
+    /// End-Point of the Line
     to: Point2D
 }
 
@@ -19,7 +21,8 @@ impl Line2D {
             to: to
         }
     }
-    fn draw_line(&self, canvas: &mut raster::Image) {
+
+    fn draw(&self, canvas: &mut raster::Image) {
         let dx: i32 = (self.to.x - self.from.x).abs() as i32;
         let dy: i32 = (self.to.y - self.from.y).abs() as i32;
 
@@ -125,9 +128,11 @@ impl Geometric2D for Line2D {
     fn draw(&self, canvas: &mut raster::Image) {
         self.draw(canvas);
     }
+
     fn draw_outline(&self, canvas: &mut raster::Image) {
         self.draw(canvas);
     }
+
     fn homogenize(&mut self) {
         self.from.homogenize();
         self.to.homogenize();

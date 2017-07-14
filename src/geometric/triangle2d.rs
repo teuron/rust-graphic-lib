@@ -1,19 +1,37 @@
 extern crate raster;
 
 use std;
-use geometric::geometric::Geometric2D;
-use geometric::Point2D;
-use geometric::interpolate_barycentric;
+use geometric::{Geometric2D, Point2D, Line2D, interpolate_barycentric};
 use raster::Color;
 
+/// Represents a 2D Triangle
+#[derive(Debug)]
 pub struct Triangle2D {
+    /// Point of Triangle
     a: Point2D,
+    /// Point of Triangle
     b: Point2D,
+    /// Point of Triangle
     c: Point2D
 }
 
 impl Triangle2D {
-    //Construct a Point(x,y)
+    /// Returns a colored Triangle
+    ///
+    /// # Arguments
+    ///
+    /// * `a` - Point of a Triangle
+    /// * `b` - Point of a Triangle
+    /// * `c` - Point of a Triangle
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use geometric::{Triangle2D, Point2D};
+    ///
+    /// //Creates a colored Triangle
+    /// let triangle = Triangle2D::new(Point2D::new(0.0, 0.0), Point2D::new(5.0, 0.0), Point2D::new(2.5, 5.0));
+    /// ```
     pub fn new(a: Point2D, b: Point2D, c: Point2D) -> Triangle2D {
         Triangle2D {
             a: a,
@@ -81,32 +99,40 @@ impl Geometric2D for Triangle2D {
             }
         }
     }
+
     fn draw_outline(&self, canvas: &mut raster::Image) {
-        //TODO
-        //draw_line(&self.a, &self.b, canvas);
-        //draw_line(&self.b, &self.c, canvas);
-        //draw_line(&self.c, &self.a, canvas);
+        let line1 = Line2D::new(self.a.clone(), self.b.clone());
+        line1.draw_outline(canvas);
+        let line2 = Line2D::new(self.b.clone(), self.c.clone());
+        line2.draw_outline(canvas);
+        let line3 = Line2D::new(self.c.clone(), self.a.clone());
+        line3.draw_outline(canvas);
     }
+
     fn homogenize(&mut self) {
         self.a.homogenize();
         self.b.homogenize();
         self.c.homogenize();
     }
+
     fn transform(&mut self, tx: f64, ty: f64) {
         self.a.transform(tx, ty);
         self.b.transform(tx, ty);
         self.c.transform(tx, ty);
     }
+
     fn scale(&mut self, sx: f64, sy: f64) {
         self.a.scale(sx, sy);
         self.b.scale(sx, sy);
         self.c.scale(sx, sy);
     }
+
     fn rotate(&mut self, angle: f64) {
         self.a.rotate(angle);
         self.b.rotate(angle);
         self.c.rotate(angle);
     }
+
     fn rotate_from_point(&mut self, angle: f64, p: &Point2D) {
         self.a.rotate_from_point(angle, p);
         self.b.rotate_from_point(angle, p);
@@ -118,11 +144,18 @@ impl Geometric2D for Triangle2D {
         self.b.scale_from_point(sx, sy, p);
         self.c.scale_from_point(sx, sy, p);
     }
+
     fn draw_aa(&self, canvas: &mut raster::Image) {
-        unimplemented!()
+        self.draw_outline_aa(canvas);
+        self.draw(canvas);
     }
 
     fn draw_outline_aa(&self, canvas: &mut raster::Image) {
-        unimplemented!()
+        let line1 = Line2D::new(self.a.clone(), self.b.clone());
+        line1.draw_outline_aa(canvas);
+        let line2 = Line2D::new(self.b.clone(), self.c.clone());
+        line2.draw_outline_aa(canvas);
+        let line3 = Line2D::new(self.c.clone(), self.a.clone());
+        line3.draw_outline_aa(canvas);
     }
 }

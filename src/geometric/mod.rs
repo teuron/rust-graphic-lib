@@ -3,7 +3,6 @@ pub use self::line2d::Line2D;
 pub use self::geometric::Geometric2D;
 pub use self::geometric::interpolate;
 pub use self::geometric::interpolate_barycentric;
-pub use self::geometric::draw_circle_aa;
 pub use self::triangle2d::Triangle2D;
 pub use self::circle2d::Circle2D;
 

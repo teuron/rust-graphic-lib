@@ -1,8 +1,6 @@
 extern crate raster;
 
 use geometric::Point2D;
-use geometric::Circle2D;
-use raster::{Color};
 
 /// Basic 2D Geometric Trait with standard functions
 pub trait Geometric2D {
@@ -123,55 +121,4 @@ pub fn interpolate(a: f64, b: f64, t: f64) -> f64 {
 /// ```
 pub fn interpolate_barycentric(a: f64, b: f64, c: f64, alpha: f64, beta: f64, gamma: f64) -> f64 {
     a * alpha + b * beta + c * gamma
-}
-
-pub fn draw_circle_aa(circle: &Circle2D, canvas: &mut raster::Image) {
-    let xm: i32 = circle.m.x as i32;
-    let ym: i32 = circle.m.y as i32;
-    let mut x: i32 = circle.r as i32;
-    let mut y: i32 = 0; /* II. quadrant from bottom left to top right */
-    let mut i: i32;
-    let mut x2: i32;
-    let mut e2: i32;
-    let mut err: i32 = 2 - 2 * x; /* error of 1.step */
-    let mut r: i32 = 1 - err;
-
-    loop {
-        i = (255 * (err + 2 * (x + y) - 2).abs()) / r; /* get blend value of pixel */
-        let color = Color::rgba(circle.get_color().r, circle.get_color().g, circle.get_color().b, i as u8);
-        canvas.set_pixel(xm + x, ym - y, color.clone()); /* I. Quadrant */
-        canvas.set_pixel(xm + y, ym + x, color.clone()); /* II. Quadrant */
-        canvas.set_pixel(xm - x, ym + y, color.clone()); /* III. Quadrant */
-        canvas.set_pixel(xm - y, ym - x, color.clone()); /* IV. Quadrant */
-        if x == 0 { break; }
-        e2 = err;
-        x2 = x; /* remember values */
-        if err > y {
-            /* x step */
-            i = (255 * (err + 2 * x - 1)) / r; /* outward pixel */
-            if i < 255 {
-                let cc = Color::rgba(circle.get_color().r, circle.get_color().g, circle.get_color().b, i as u8);
-                canvas.set_pixel(xm + x, ym - y + 1, cc.clone());
-                canvas.set_pixel(xm + y - 1, ym + x, cc.clone());
-                canvas.set_pixel(xm - x, ym + y - 1, cc.clone());
-                canvas.set_pixel(xm - y + 1, ym - x, cc.clone());
-            }
-            x -= 1;
-            err -= x * 2 - 1;
-        }
-        x2 -= 1;
-        if e2 <= x2 + 1 {
-            /* y step */
-            i = (255 * (1 - 2 * y - e2)) / r; /* inward pixel */
-            if i < 255 {
-                let cc = Color::rgba(circle.get_color().r, circle.get_color().g, circle.get_color().b, i as u8);
-                canvas.set_pixel(xm + x2, ym - y, cc.clone());
-                canvas.set_pixel(xm + y, ym + x2, cc.clone());
-                canvas.set_pixel(xm - x2, ym + y, cc.clone());
-                canvas.set_pixel(xm - y, ym - x2, cc.clone());
-            }
-            y -= 1;
-            err -= y * 2 - 1;
-        }
-    }
 }

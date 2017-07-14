@@ -6,26 +6,99 @@ use std::f64::consts::PI;
 use raster::Color;
 use geometric::geometric::Geometric2D;
 
+/// Represents a 2D Point
 #[derive(Debug)]
 pub struct Point2D {
+    /// X-Coordinate of the Point
     pub x: f64,
+    /// Y-Coordinate of the Point
     pub y: f64,
+    /// Z-Coordinate of the Point
     pub z: f64,
+    /// Color of the Point
     color: Color
 }
 
 impl Point2D {
-    //Construct a Point(x,y)
-    pub fn new(x: f64, y: f64, z: f64) -> Point2D {
-        Point2D::new_color(x, y, z, Color::white())
+    /// Returns a white Point
+    ///
+    /// # Arguments
+    ///
+    /// * `x` - X-Coordinate of the Point
+    /// * `y` - Y-Coordinate of the Point
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use geometric::{Point2D};
+    ///
+    /// //Creates a white Point
+    /// let point = Point2D::new(5.0, 5.0);
+    /// ```
+    pub fn new(x: f64, y: f64) -> Point2D {
+        Point2D::new_color_inhomogenized(x, y, 1.0f64, Color::white())
     }
-    pub fn new_homogenized(x: f64, y: f64) -> Point2D {
-        Point2D::new_color(x, y, 1.0f64, Color::white())
+
+    /// Returns an inhomogenized white Point
+    ///
+    /// # Arguments
+    ///
+    /// * `x` - X-Coordinate of the Point
+    /// * `y` - Y-Coordinate of the Point
+    /// * `z` - Homogeneous-Value
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use geometric::{Point2D};
+    ///
+    /// //Creates a white Point
+    /// let point = Point2D::new_inhomogenized(5.0, 5.0, 5.0);
+    /// ```
+    pub fn new_inhomogenized(x: f64, y: f64, z: f64) -> Point2D {
+        Point2D::new_color_inhomogenized(x, y, z, Color::white())
     }
-    pub fn new_color_homogenized(x: f64, y: f64, color: Color) -> Point2D {
-        Point2D::new_color(x, y, 1.0f64, color)
+
+    /// Returns a colored Point
+    ///
+    /// # Arguments
+    ///
+    /// * `x` - X-Coordinate of the Point
+    /// * `y` - Y-Coordinate of the Point
+    /// * `color` - Color of the Point
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use geometric::{Point2D};
+    /// use raster::{Color};
+    ///
+    /// //Creates a colored Point
+    /// let point = Point2D::new_color(5.0, 5.0, Color::rgb(10,10,10));
+    /// ```
+    pub fn new_color(x: f64, y: f64, color: Color) -> Point2D {
+        Point2D::new_color_inhomogenized(x, y, 1.0f64, color)
     }
-    pub fn new_color(x: f64, y: f64, z: f64, color: Color) -> Point2D {
+
+    /// Returns an inhomogenized colored Point
+    ///
+    /// # Arguments
+    ///
+    /// * `x` - X-Coordinate of the Point
+    /// * `y` - Y-Coordinate of the Point
+    /// * `z` - Homogeneous-Value
+    /// * `color` - Color of the Point
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use geometric::{Point2D};
+    /// use raster::{Color};
+    ///
+    /// //Creates a inhomogenized colored Point
+    /// let point = Point2D::new_color_inhomogenized(5.0, 5.0, 5.0, Color::rgb(10,10,10));
+    /// ```
+    pub fn new_color_inhomogenized(x: f64, y: f64, z: f64, color: Color) -> Point2D {
         Point2D {
             x: x,
             y: y,
@@ -33,12 +106,25 @@ impl Point2D {
             color: color
         }
     }
+
+    /// Returns the color of the Point
     pub fn get_color(&self) -> Color { self.color.clone() }
 }
 
 impl std::fmt::Display for Point2D {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "Point x:{}, y:{}, z:{}", self.x, self.y, self.z)
+    }
+}
+
+impl Clone for Point2D {
+    fn clone(&self) -> Point2D {
+        Point2D {
+            x: self.x.clone(),
+            y: self.y.clone(),
+            z: self.z.clone(),
+            color: Color::rgba(self.color.r.clone(), self.color.g.clone(), self.color.b.clone(), self.color.a.clone())
+        }
     }
 }
 
