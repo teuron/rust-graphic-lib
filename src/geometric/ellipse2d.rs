@@ -1,4 +1,4 @@
-extern crate raster;
+/*extern crate raster;
 
 use std;
 use std::f64::consts::PI;
@@ -6,7 +6,6 @@ use std::f64::consts::PI;
 use raster::Color;
 use geometric::Geometric2D;
 use geometric::Point2D;
-use geometric::draw_circle_aa;
 
 #[derive(Debug)]
 pub struct Circle2D {
@@ -30,15 +29,15 @@ impl std::fmt::Display for Circle2D {
 
 impl Geometric2D for Circle2D {
     fn homogenize(&mut self) {
-        self.m.homogenize();
+        unimplemented!();
     }
 
     fn transform(&mut self, tx: f64, ty: f64) {
-        self.m.transform(tx, ty);
+        unimplemented!();
     }
 
     fn scale(&mut self, sx: f64, sy: f64) {
-        self.r = self.r * sx;
+        unimplemented!();
     }
 
     fn rotate(&mut self, angle: f64) {
@@ -54,35 +53,8 @@ impl Geometric2D for Circle2D {
     }
 
     fn draw(&self, canvas: &mut raster::Image) {
-        draw_circle_aa(self, canvas);
-        /*   let xm: i32 = self.m.x as i32;
-           let ym: i32 = self.m.y as i32;
-           let mut radius: i32 = self.r as i32;
-           let mut x: i32 = -radius;
-           let mut y: i32 = 0;
-           let mut err: i32 = 2 - 2 * radius;
-           loop {
-               canvas.set_pixel(xm - x, ym - y, self.m.get_color().clone());/* I. Quadrant +x +y */
-               canvas.set_pixel(xm + x, ym - y, self.m.get_color().clone());/* II. Quadrant -x +y */
-               canvas.set_pixel(xm + x, ym + y, self.m.get_color().clone());/* III. Quadrant -x -y */
-               canvas.set_pixel(xm - x, ym + y, self.m.get_color().clone());/* IV. Quadrant +x -y */
-
-               radius = err;
-               if radius <= y {
-                   /* e_xy+e_y < 0 */
-                   y += 1;
-                   err += y * 2 + 1;
-               }
-               if radius > x || err > y {
-                   /* e_xy+e_x > 0 or no 2nd y-step */
-                   x += 1;
-                   err += x * 2 + 1;
-               }
-
-               if x > 0 { break; }
-           }*/
+        unimplemented!();
     }
-
 
     fn draw_outline(&self, canvas: &mut raster::Image) {
         let r2 = (self.r * self.r) as i32;
@@ -96,12 +68,5 @@ impl Geometric2D for Circle2D {
                 canvas.set_pixel(self.m.x as i32 + tx, self.m.y as i32 + ty, self.m.get_color());
             }
         }
-    }
-    fn draw_aa(&self, canvas: &mut raster::Image) {
-        unimplemented!()
-    }
-
-    fn draw_outline_aa(&self, canvas: &mut raster::Image) {
-        unimplemented!()
     }
 }

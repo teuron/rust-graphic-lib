@@ -3,7 +3,6 @@ extern crate raster;
 use std;
 use geometric::geometric::Geometric2D;
 use geometric::Point2D;
-use geometric::draw_line;
 use geometric::interpolate_barycentric;
 use raster::Color;
 
@@ -83,9 +82,10 @@ impl Geometric2D for Triangle2D {
         }
     }
     fn draw_outline(&self, canvas: &mut raster::Image) {
-        draw_line(&self.a, &self.b, canvas);
-        draw_line(&self.b, &self.c, canvas);
-        draw_line(&self.c, &self.a, canvas);
+        //TODO
+        //draw_line(&self.a, &self.b, canvas);
+        //draw_line(&self.b, &self.c, canvas);
+        //draw_line(&self.c, &self.a, canvas);
     }
     fn homogenize(&mut self) {
         self.a.homogenize();
@@ -117,5 +117,12 @@ impl Geometric2D for Triangle2D {
         self.a.scale_from_point(sx, sy, p);
         self.b.scale_from_point(sx, sy, p);
         self.c.scale_from_point(sx, sy, p);
+    }
+    fn draw_aa(&self, canvas: &mut raster::Image) {
+        unimplemented!()
+    }
+
+    fn draw_outline_aa(&self, canvas: &mut raster::Image) {
+        unimplemented!()
     }
 }

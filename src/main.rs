@@ -30,7 +30,7 @@ fn main() {
     //      triangle.rotate_from_point(1.0, &center);
     //      let mut r = Renderer::new(1000, 1000);
     //      r.add(&triangle);
-    r.draw_outline();
+    r.draw();
     r.save_as("nice_out.png".to_owned());
     // }
 

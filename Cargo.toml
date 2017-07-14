@@ -3,5 +3,11 @@ name = "graphic_library"
 version = "0.1.0"
 authors = ["Lukas Abfalterer <labfalterer@gmail.com>"]
 
+[lib]
+name = "graphic_library"
+
+[[bin]]
+name = "graphic_bin"
+
 [dependencies]
 raster = "0.1.0"

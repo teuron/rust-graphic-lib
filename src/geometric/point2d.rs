@@ -84,4 +84,11 @@ impl Geometric2D for Point2D {
     fn draw_outline(&self, canvas: &mut raster::Image) {
         canvas.set_pixel(self.x as i32, self.y as i32, self.color.clone()).unwrap();
     }
+    fn draw_aa(&self, canvas: &mut raster::Image) {
+        canvas.set_pixel(self.x as i32, self.y as i32, self.color.clone()).unwrap();
+    }
+
+    fn draw_outline_aa(&self, canvas: &mut raster::Image) {
+        canvas.set_pixel(self.x as i32, self.y as i32, self.color.clone()).unwrap();
+    }
 }

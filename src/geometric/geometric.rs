@@ -1,118 +1,177 @@
 extern crate raster;
 
 use geometric::Point2D;
+use geometric::Circle2D;
 use raster::{Color};
 
+/// Basic 2D Geometric Trait with standard functions
 pub trait Geometric2D {
+    /// Homogenizes the Coordinates of the given struct
     fn homogenize(&mut self);
+
+    /// Transforms a Geometric-Object to a specified Position
+    ///
+    /// # Arguments
+    ///
+    /// * `tx` - Translation on the x-axis
+    /// * `ty` - Translation on the y-axis
+    ///
     fn transform(&mut self, tx: f64, ty: f64);
+
+    /// Scales a Geometric-Object
+    ///
+    /// # Arguments
+    ///
+    /// * `sx` - Scales on the x-axis
+    /// * `sy` - Scales on the y-axis
+    ///
     fn scale(&mut self, sx: f64, sy: f64);
+
+    /// Rotates a Geometric-Object from the coordinate origin (0,0)
+    ///
+    /// # Arguments
+    ///
+    /// * `angle` - Angle in degrees, positive values rotate counter-clock vice
+    ///
     fn rotate(&mut self, angle: f64);
+
+    /// Rotates a Geometric-Object from a specified point as origin
+    ///
+    /// # Arguments
+    ///
+    /// * `angle` - Angle in degrees, positive values rotate counter-clock vice
+    /// * `p` - Point of origin to rotate from
+    ///
     fn rotate_from_point(&mut self, angle: f64, p: &Point2D);
+
+    /// Scales a Geometric-Object from a specified point as origin
+    ///
+    /// # Arguments
+    ///
+    /// * `sx` - Scales on the x-axis
+    /// * `sy` - Scales on the y-axis
+    /// * `angle` - Angle in degrees, positive values rotate counter-clock vice
+    ///
     fn scale_from_point(&mut self, sx: f64, sy: f64, p: &Point2D);
+
+    /// Draws a Geometric-Object onto an Image
+    ///
+    /// # Arguments
+    ///
+    /// * `canvas` - Drawing Surface
+    ///
     fn draw(&self, canvas: &mut raster::Image);
+
+    /// Draws the outline of a Geometric-Object onto an Image
+    ///
+    /// # Arguments
+    ///
+    /// * `canvas` - Drawing Surface
+    ///
     fn draw_outline(&self, canvas: &mut raster::Image);
+
+    /// Draws an anti-aliased Geometric-Object onto an Image
+    ///
+    /// # Arguments
+    ///
+    /// * `canvas` - Drawing Surface
+    ///
+    fn draw_aa(&self, canvas: &mut raster::Image);
+
+    /// Draws the anti-aliased outline of a Geometric-Object onto an Image
+    ///
+    /// # Arguments
+    ///
+    /// * `canvas` - Drawing Surface
+    ///
+    fn draw_outline_aa(&self, canvas: &mut raster::Image);
 }
 
+/// Linearly interpolates two values together
+///
+/// # Arguments
+///
+/// * `a` - 1st value to interpolate
+/// * `b` - 2nd value to interpolate
+/// * `t` - Percentage Value between 0..1
+/// # Example
+///
+/// ```
+/// //returns 7.5
+/// //a*(1-t)+b*t
+/// let interpolated = interpolate(0.0, 10.0, 0.75);
+/// ```
 pub fn interpolate(a: f64, b: f64, t: f64) -> f64 {
     a * (1.0f64 - t) + b * t
 }
 
+/// Barycentricly interpolates three values together
+/// Condition: alpha + beta + gamma == 1
+/// # Arguments
+///
+/// * `a` - 1st value to interpolate
+/// * `b` - 2nd value to interpolate
+/// * `c` - 2nd value to interpolate
+/// * `alpha` - Percentage Value between 0..1
+/// * `beta` - Percentage Value between 0..1
+/// * `gamma` - Percentage Value between 0..1
+/// # Example
+///
+/// ```
+/// //a*alpha + b*beta + c*gamma
+/// let interpolated = interpolate_barycentric(0.0, 10.0, 20.0, 0.25, 0.25, 0.50);
+/// ```
 pub fn interpolate_barycentric(a: f64, b: f64, c: f64, alpha: f64, beta: f64, gamma: f64) -> f64 {
     a * alpha + b * beta + c * gamma
 }
 
-pub fn draw_line(from: &Point2D, to: &Point2D, canvas: &mut raster::Image) {
-    let dx: i32 = (to.x - from.x).abs() as i32;
-    let dy: i32 = (to.y - from.y).abs() as i32;
-
-    let sgnx: i32 = (to.x - from.x).signum() as i32;
-    let sgny: i32 = (to.y - from.y).signum() as i32;
-    //Parallel Case
-    let mut ppx: i32 = 0;
-    let mut ppy: i32 = 0;
-
-    //Diagonal Case
-    let ddx: i32 = sgnx;
-    let ddy: i32 = -sgny;
-
-    let err_fast: f64;
-    let err_slow: f64;
-    if dx > dy {
-        ppx = sgnx;
-        err_fast = dy as f64;
-        err_slow = dx as f64;
-    } else {
-        ppy = -sgny;
-        err_fast = dx as f64;
-        err_slow = dy as f64;
-    }
-    let mut x: i32 = from.x as i32;
-    let mut y: i32 = (from.y as i32 - canvas.height as i32).abs();
-    let mut err: f64 = err_slow / 2f64;
-
-    canvas.set_pixel(x, y, from.get_color()).unwrap();
-    let c: i32 = err_slow as i32;
-    for _ in 0..c {
-        err -= err_fast;
-        //Diagonal Case
-        if
-            err < 0f64 {
-            err += err_slow;
-            x += ddx;
-            y += ddy;
-        } else //Parallel Case
-        {
-            x += ppx;
-            y += ppy;
-        }
-        let dif = ((x as f64) - from.x).abs() / (dx as f64);
-        let r = interpolate(from.get_color().r as f64, to.get_color().r as f64, dif);
-        let g = interpolate(from.get_color().g as f64, to.get_color().g as f64, dif);
-        let b = interpolate(from.get_color().b as f64, to.get_color().b as f64, dif);
-        canvas.set_pixel(x, y, Color::rgb(r as u8, g as u8, b as u8)).unwrap();
-    }
-}
-
-pub fn draw_line_aa(from: &Point2D, to: &Point2D, canvas: &mut raster::Image) {
-    let dx = (to.x - from.x).abs() as i32;
-    let sx = if from.x < to.x { 1 } else { -1 };
-    let dy = (to.y - from.y).abs() as i32;
-    let sy = if from.y < to.y { 1 } else { -1 };
+pub fn draw_circle_aa(circle: &Circle2D, canvas: &mut raster::Image) {
+    let xm: i32 = circle.m.x as i32;
+    let ym: i32 = circle.m.y as i32;
+    let mut x: i32 = circle.r as i32;
+    let mut y: i32 = 0; /* II. quadrant from bottom left to top right */
+    let mut i: i32;
     let mut x2: i32;
     let mut e2: i32;
-    let mut err: i32 = dx - dy; /* error value e_xy */
-    let ed: f32 = if dx + dy == 0 { 1.0f32 } else { ((dx * dx + dy * dy) as f32).sqrt() };
-    let ei: i32 = ed as i32;
+    let mut err: i32 = 2 - 2 * x; /* error of 1.step */
+    let mut r: i32 = 1 - err;
 
-    let mut x0: i32 = from.x as i32;
-    let mut y0: i32 = from.y as i32;
-    let x1: i32 = to.x as i32;
-    let y1: i32 = to.y as i32;
     loop {
-        let test = 1.0f32 - ((err - dx + dy).abs() as f32 / ed);
-        let color = from.get_color();
-        canvas.set_pixel(x0, y0, Color::rgb(((color.r as f32) * test) as u8, (color.g as f32 * test) as u8, (color.b as f32 * test) as u8)).unwrap();//TODO Add Color and mixing
+        i = (255 * (err + 2 * (x + y) - 2).abs()) / r; /* get blend value of pixel */
+        let color = Color::rgba(circle.get_color().r, circle.get_color().g, circle.get_color().b, i as u8);
+        canvas.set_pixel(xm + x, ym - y, color.clone()); /* I. Quadrant */
+        canvas.set_pixel(xm + y, ym + x, color.clone()); /* II. Quadrant */
+        canvas.set_pixel(xm - x, ym + y, color.clone()); /* III. Quadrant */
+        canvas.set_pixel(xm - y, ym - x, color.clone()); /* IV. Quadrant */
+        if x == 0 { break; }
         e2 = err;
-        x2 = x0;
-
-        if 2 * e2 >= -dx {
-            if x0 == x1 { break; }
-            if e2 + dy < ei {
-                let tt = 1.0f32 - (e2 + dy) as f32 / ed;
-                canvas.set_pixel(x0, y0 + sy, Color::rgb((color.r as f32 * tt) as u8, (color.g as f32 * tt) as u8, (color.b as f32 * tt) as u8)).unwrap();
+        x2 = x; /* remember values */
+        if err > y {
+            /* x step */
+            i = (255 * (err + 2 * x - 1)) / r; /* outward pixel */
+            if i < 255 {
+                let cc = Color::rgba(circle.get_color().r, circle.get_color().g, circle.get_color().b, i as u8);
+                canvas.set_pixel(xm + x, ym - y + 1, cc.clone());
+                canvas.set_pixel(xm + y - 1, ym + x, cc.clone());
+                canvas.set_pixel(xm - x, ym + y - 1, cc.clone());
+                canvas.set_pixel(xm - y + 1, ym - x, cc.clone());
             }
-            err -= dy;
-            x0 += sx;
+            x -= 1;
+            err -= x * 2 - 1;
         }
-        if 2 * e2 <= dy {
-            if y0 == y1 { break; }
-            if dx - e2 < ei {
-                let base = 1.0f32 - ((dx - e2) as f32 / ed);
-                canvas.set_pixel(x2 + sx, y0, Color::rgb((color.r as f32 * base) as u8, (color.g as f32 * base) as u8, (color.b as f32 * base) as u8)).unwrap();
+        x2 -= 1;
+        if e2 <= x2 + 1 {
+            /* y step */
+            i = (255 * (1 - 2 * y - e2)) / r; /* inward pixel */
+            if i < 255 {
+                let cc = Color::rgba(circle.get_color().r, circle.get_color().g, circle.get_color().b, i as u8);
+                canvas.set_pixel(xm + x2, ym - y, cc.clone());
+                canvas.set_pixel(xm + y, ym + x2, cc.clone());
+                canvas.set_pixel(xm - x2, ym + y, cc.clone());
+                canvas.set_pixel(xm - y, ym - x2, cc.clone());
             }
-            err += dx;
-            y0 += sy;
+            y -= 1;
+            err -= y * 2 - 1;
         }
     }
 }
