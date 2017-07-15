@@ -30,10 +30,12 @@ impl Point2D {
     /// # Example
     ///
     /// ```
-    /// use geometric::{Point2D};
-    ///
+    /// extern crate graphic_library;
+    /// use graphic_library::geometric::{Point2D};
+    /// fn main(){
     /// //Creates a white Point
     /// let point = Point2D::new(5.0, 5.0);
+    /// }
     /// ```
     pub fn new(x: f64, y: f64) -> Point2D {
         Point2D::new_color_inhomogenized(x, y, 1.0f64, Color::white())
@@ -50,10 +52,12 @@ impl Point2D {
     /// # Example
     ///
     /// ```
-    /// use geometric::{Point2D};
-    ///
+    /// extern crate graphic_library;
+    /// use graphic_library::geometric::{Point2D};
+    /// fn main(){
     /// //Creates a white Point
     /// let point = Point2D::new_inhomogenized(5.0, 5.0, 5.0);
+    /// }
     /// ```
     pub fn new_inhomogenized(x: f64, y: f64, z: f64) -> Point2D {
         Point2D::new_color_inhomogenized(x, y, z, Color::white())
@@ -70,11 +74,14 @@ impl Point2D {
     /// # Example
     ///
     /// ```
-    /// use geometric::{Point2D};
+    /// extern crate graphic_library;
+    /// extern crate raster;
     /// use raster::{Color};
-    ///
+    /// use graphic_library::geometric::{Point2D};
+    /// fn main(){
     /// //Creates a colored Point
     /// let point = Point2D::new_color(5.0, 5.0, Color::rgb(10,10,10));
+    /// }
     /// ```
     pub fn new_color(x: f64, y: f64, color: Color) -> Point2D {
         Point2D::new_color_inhomogenized(x, y, 1.0f64, color)
@@ -92,11 +99,14 @@ impl Point2D {
     /// # Example
     ///
     /// ```
-    /// use geometric::{Point2D};
+    /// extern crate graphic_library;
+    /// extern crate raster;
     /// use raster::{Color};
-    ///
+    /// use graphic_library::geometric::{Point2D};
+    /// fn main(){
     /// //Creates a inhomogenized colored Point
     /// let point = Point2D::new_color_inhomogenized(5.0, 5.0, 5.0, Color::rgb(10,10,10));
+    /// }
     /// ```
     pub fn new_color_inhomogenized(x: f64, y: f64, z: f64, color: Color) -> Point2D {
         Point2D {
@@ -147,8 +157,10 @@ impl Geometric2D for Point2D {
 
     fn rotate(&mut self, angle: f64) {
         let a = angle * PI / 180.0;
-        self.x = self.x * a.cos() - self.y * a.sin();
-        self.y = self.x * a.sin() + self.y * a.cos();
+        let x = self.x;
+        let y = self.y;
+        self.x = x * a.cos() - y * a.sin();
+        self.y = x * a.sin() + y * a.cos();
     }
 
     fn rotate_from_point(&mut self, angle: f64, p: &Point2D) {
@@ -176,5 +188,59 @@ impl Geometric2D for Point2D {
 
     fn draw_outline_aa(&self, canvas: &mut raster::Image) {
         canvas.set_pixel(self.x as i32, self.y as i32, self.color.clone()).unwrap();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn homogenize() {
+        let mut point = Point2D::new_inhomogenized(10.0, 6.0, 2.0);
+        point.homogenize();
+        assert_eq!(5.0, point.x);
+        assert_eq!(3.0, point.y);
+        assert_eq!(1.0, point.z);
+    }
+
+    #[test]
+    fn transform() {
+        let mut point = Point2D::new(10.0, 10.0);
+        point.transform(5.0, -5.0);
+        assert_eq!(15.0, point.x);
+        assert_eq!(5.0, point.y);
+    }
+
+    #[test]
+    fn scale() {
+        let mut point = Point2D::new(10.0, 5.0);
+        point.scale(2.0, 0.2);
+        assert_eq!(20.0, point.x);
+        assert_eq!(1.0, point.y);
+    }
+
+    #[test]
+    fn rotate() {
+        let mut point = Point2D::new(1.0, 0.0);
+        point.rotate(90.0);
+        assert!((0.0 - point.x) < 0.00001);
+        assert!((1.0 - point.y) < 0.00001);
+    }
+
+    #[test]
+    fn scale_from_point() {
+        let mut point = Point2D::new(10.0, 5.0);
+        point.scale_from_point(2.0, 0.2, &Point2D::new(1.0, 1.0));
+        assert_eq!(19.0, point.x);
+        assert_eq!(1.8, point.y);
+    }
+
+    #[test]
+    fn rotate_from_point() {
+        let mut point = Point2D::new(2.0, 0.0);
+        point.rotate_from_point(90.0, &Point2D::new(1.0, 0.0));
+        assert!((0.0 - point.x) < 0.00001);
+        assert!((1.0 - point.y) < 0.00001);
     }
 }

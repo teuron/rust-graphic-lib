@@ -14,7 +14,23 @@ pub struct Line2D {
 }
 
 impl Line2D {
-    //Construct a Line
+    /// Returns a colored Line
+    ///
+    /// # Arguments
+    ///
+    /// * `a` - Point of a Line
+    /// * `b` - Point of a Line
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// extern crate graphic_library;
+    /// use graphic_library::geometric::{Line2D, Point2D};
+    /// fn main(){
+    /// //Creates a colored Line
+    /// let line = Line2D::new(Point2D::new(0.0, 0.0), Point2D::new(5.0, 5.0));
+    /// }
+    /// ```
     pub fn new(from: Point2D, to: Point2D) -> Line2D {
         Line2D {
             from: from,

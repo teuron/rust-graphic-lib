@@ -27,10 +27,12 @@ impl Triangle2D {
     /// # Example
     ///
     /// ```
-    /// use geometric::{Triangle2D, Point2D};
-    ///
+    /// extern crate graphic_library;
+    /// use graphic_library::geometric::{Triangle2D, Point2D};
+    /// fn main(){
     /// //Creates a colored Triangle
     /// let triangle = Triangle2D::new(Point2D::new(0.0, 0.0), Point2D::new(5.0, 0.0), Point2D::new(2.5, 5.0));
+    /// }
     /// ```
     pub fn new(a: Point2D, b: Point2D, c: Point2D) -> Triangle2D {
         Triangle2D {

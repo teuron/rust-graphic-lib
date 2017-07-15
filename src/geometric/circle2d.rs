@@ -1,7 +1,6 @@
 extern crate raster;
 
 use std;
-use std::f64::consts::PI;
 
 use raster::Color;
 use geometric::Geometric2D;
@@ -27,10 +26,12 @@ impl Circle2D {
     /// # Example
     ///
     /// ```
-    /// use geometric::{Circle2D, Point2D};
-    ///
+    /// extern crate graphic_library;
+    /// use graphic_library::geometric::{Circle2D, Point2D};
+    /// fn main(){
     /// //Creates a white Circle with center in (0,0)
     /// let circle = Circle2D::new(5.0, Point2D::new(0.0,0.0));
+    /// }
     /// ```
     pub fn new(r: f64, m: Point2D) -> Circle2D {
         Circle2D { r: r, m: m }
@@ -55,6 +56,8 @@ impl Geometric2D for Circle2D {
         self.m.transform(tx, ty);
     }
 
+    #[allow(unused_variables)]
+    //TODO make ellipsis if sx and sy not equals
     fn scale(&mut self, sx: f64, sy: f64) {
         self.r = self.r * sx;
     }
@@ -67,6 +70,8 @@ impl Geometric2D for Circle2D {
         self.m.rotate_from_point(angle, p);
     }
 
+    #[allow(unused_variables)]
+    //TODO make ellipsis if sx and sy not equals
     fn scale_from_point(&mut self, sx: f64, sy: f64, p: &Point2D) {
         self.r *= sx;
     }
@@ -79,10 +84,10 @@ impl Geometric2D for Circle2D {
         let mut y: i32 = 0;
         let mut err: i32 = 2 - 2 * radius;
         loop {
-            canvas.set_pixel(xm - x, ym - y, self.m.get_color().clone());/* I. Quadrant +x +y */
-            canvas.set_pixel(xm + x, ym - y, self.m.get_color().clone());/* II. Quadrant -x +y */
-            canvas.set_pixel(xm + x, ym + y, self.m.get_color().clone());/* III. Quadrant -x -y */
-            canvas.set_pixel(xm - x, ym + y, self.m.get_color().clone());/* IV. Quadrant +x -y */
+            canvas.set_pixel(xm - x, ym - y, self.m.get_color().clone()).unwrap();/* I. Quadrant +x +y */
+            canvas.set_pixel(xm + x, ym - y, self.m.get_color().clone()).unwrap();/* II. Quadrant -x +y */
+            canvas.set_pixel(xm + x, ym + y, self.m.get_color().clone()).unwrap();/* III. Quadrant -x -y */
+            canvas.set_pixel(xm - x, ym + y, self.m.get_color().clone()).unwrap();/* IV. Quadrant +x -y */
 
             radius = err;
             if radius <= y {
@@ -109,7 +114,7 @@ impl Geometric2D for Circle2D {
             let tx = (i % rr) - r;
             let ty = (i / rr) - r;
             if tx * tx + ty * ty <= r2 {
-                canvas.set_pixel(self.m.x as i32 + tx, self.m.y as i32 + ty, self.m.get_color());
+                canvas.set_pixel(self.m.x as i32 + tx, self.m.y as i32 + ty, self.m.get_color()).unwrap();
             }
         }
     }
@@ -128,15 +133,15 @@ impl Geometric2D for Circle2D {
         let mut x2: i32;
         let mut e2: i32;
         let mut err: i32 = 2 - 2 * x; /* error of 1.step */
-        let mut r: i32 = 1 - err;
+        let r: i32 = 1 - err;
 
         loop {
             i = (255 * (err + 2 * (x + y) - 2).abs()) / r; /* get blend value of pixel */
             let color = Color::rgba(self.get_color().r, self.get_color().g, self.get_color().b, i as u8);
-            canvas.set_pixel(xm + x, ym - y, color.clone()); /* I. Quadrant */
-            canvas.set_pixel(xm + y, ym + x, color.clone()); /* II. Quadrant */
-            canvas.set_pixel(xm - x, ym + y, color.clone()); /* III. Quadrant */
-            canvas.set_pixel(xm - y, ym - x, color.clone()); /* IV. Quadrant */
+            canvas.set_pixel(xm + x, ym - y, color.clone()).unwrap(); /* I. Quadrant */
+            canvas.set_pixel(xm + y, ym + x, color.clone()).unwrap(); /* II. Quadrant */
+            canvas.set_pixel(xm - x, ym + y, color.clone()).unwrap(); /* III. Quadrant */
+            canvas.set_pixel(xm - y, ym - x, color.clone()).unwrap(); /* IV. Quadrant */
             if x == 0 { break; }
             e2 = err;
             x2 = x; /* remember values */
@@ -145,10 +150,10 @@ impl Geometric2D for Circle2D {
                 i = (255 * (err + 2 * x - 1)) / r; /* outward pixel */
                 if i < 255 {
                     let cc = Color::rgba(self.get_color().r, self.get_color().g, self.get_color().b, i as u8);
-                    canvas.set_pixel(xm + x, ym - y + 1, cc.clone());
-                    canvas.set_pixel(xm + y - 1, ym + x, cc.clone());
-                    canvas.set_pixel(xm - x, ym + y - 1, cc.clone());
-                    canvas.set_pixel(xm - y + 1, ym - x, cc.clone());
+                    canvas.set_pixel(xm + x, ym - y + 1, cc.clone()).unwrap();
+                    canvas.set_pixel(xm + y - 1, ym + x, cc.clone()).unwrap();
+                    canvas.set_pixel(xm - x, ym + y - 1, cc.clone()).unwrap();
+                    canvas.set_pixel(xm - y + 1, ym - x, cc.clone()).unwrap();
                 }
                 x -= 1;
                 err -= x * 2 - 1;
@@ -159,10 +164,10 @@ impl Geometric2D for Circle2D {
                 i = (255 * (1 - 2 * y - e2)) / r; /* inward pixel */
                 if i < 255 {
                     let cc = Color::rgba(self.get_color().r, self.get_color().g, self.get_color().b, i as u8);
-                    canvas.set_pixel(xm + x2, ym - y, cc.clone());
-                    canvas.set_pixel(xm + y, ym + x2, cc.clone());
-                    canvas.set_pixel(xm - x2, ym + y, cc.clone());
-                    canvas.set_pixel(xm - y, ym - x2, cc.clone());
+                    canvas.set_pixel(xm + x2, ym - y, cc.clone()).unwrap();
+                    canvas.set_pixel(xm + y, ym + x2, cc.clone()).unwrap();
+                    canvas.set_pixel(xm - x2, ym + y, cc.clone()).unwrap();
+                    canvas.set_pixel(xm - y, ym - x2, cc.clone()).unwrap();
                 }
                 y -= 1;
                 err -= y * 2 - 1;

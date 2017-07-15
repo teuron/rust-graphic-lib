@@ -95,9 +95,13 @@ pub trait Geometric2D {
 /// # Example
 ///
 /// ```
+/// extern crate graphic_library;
+/// use graphic_library::geometric::interpolate;
+/// fn main() {
 /// //returns 7.5
 /// //a*(1-t)+b*t
 /// let interpolated = interpolate(0.0, 10.0, 0.75);
+/// }
 /// ```
 pub fn interpolate(a: f64, b: f64, t: f64) -> f64 {
     a * (1.0f64 - t) + b * t
@@ -116,8 +120,12 @@ pub fn interpolate(a: f64, b: f64, t: f64) -> f64 {
 /// # Example
 ///
 /// ```
+/// extern crate graphic_library;
+/// use graphic_library::geometric::interpolate_barycentric;
+/// fn main() {
 /// //a*alpha + b*beta + c*gamma
 /// let interpolated = interpolate_barycentric(0.0, 10.0, 20.0, 0.25, 0.25, 0.50);
+/// }
 /// ```
 pub fn interpolate_barycentric(a: f64, b: f64, c: f64, alpha: f64, beta: f64, gamma: f64) -> f64 {
     a * alpha + b * beta + c * gamma
